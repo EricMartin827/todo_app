@@ -27,11 +27,11 @@ app.post('/todos', (req, res) => {
 });
 
 app.get('/todos', (req, res) => {
-  Todo.find().then((todos) => {
-    res.send({todos});
-  }, (e) => {
-    res.status(400).send(e);
-  });
+    Todo.find().then((todos) => {
+	res.send({todos});
+    }, (e) => {
+	res.status(400).send(e);
+    });
 });
 
 app.get('/todos/:id', (req, res) => {
@@ -50,6 +50,42 @@ app.get('/todos/:id', (req, res) => {
   }).catch((e) => {
     res.status(400).send();
   });
+});
+
+app.delete("/todos", (req, res) => {
+
+    var query = req.body;
+    Todo.findOneAndRemove(query)
+	.then((ele) => {
+	    if (!ele) {
+		return res.status(404).send();
+	    }
+	    res.send(ele);
+	})
+	.catch((err) => {
+	    res.status(400).send(err);
+	});
+});
+
+app.delete("/todos/:id", (req, res) => {
+
+    id = req.params.id;
+
+    if (!ObjectID.isValid(id)) {
+	return res.status(404).send();
+    }
+    
+    Todo.findByIdAndRemove(id)
+	.then((doc) => {
+	    if (!doc) {
+		return res.status(404).send();
+	    }
+	    console.log("Sending Document");
+	    res.send(doc);
+	})
+	.catch((err) => {
+	    res.status(400).send(err);
+	});
 });
 
 app.listen(port, () => {
